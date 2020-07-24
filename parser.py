@@ -6,4 +6,10 @@ with open(path, 'r') as f:
     data = f.readlines()
 
 for line in data:
-    print(line)
+    # skip commented lines
+    if line[:1] == '#':
+        continue
+    # strip out all whitespace
+    trimmed_line = ''.join(line.split())
+    parsed_line = trimmed_line.split('=')
+    # print(parsed_line)
