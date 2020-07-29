@@ -20,13 +20,13 @@ parameters_schema = {
 }
 
 bool_conversion_schema = {
-        'true': True,
-        'false': False,
-        'yes': True,
-        'no': False,
-        'on': True,
-        'off': False
-    }
+    'true': True,
+    'false': False,
+    'yes': True,
+    'no': False,
+    'on': True,
+    'off': False
+}
 
 def str_splitter(string):
     # split string into list of strings delimited by first instance of '=' character. Cannot handle key names containing '='
@@ -58,10 +58,12 @@ for line in data:
         continue
     # split line into key/value strings
     parsed_line = str_splitter(line)
-    key = parsed_line[0]
-    value = parsed_line[1]
     try:
-        parsed_line[0] in parameters_schema
+        key, value = parsed_line
+    except ValueError:
+        print('There should only be two items in the list: one key and one value')
+    try:
+        key in parameters_schema
     except KeyError:
         print('Key not found in parameters schema.')
     converted_value = str_converter(value, parameters_schema[key])
