@@ -28,7 +28,7 @@ bool_conversion_schema = {
     'off': False
 }
 
-def str_splitter(string):
+def parse_string(string):
     # split string into list of strings delimited by first instance of '=' character. Cannot handle key names containing '='
     delimited_str_list = string.split('=', 1)
     # strip out leading and trailing whitespace from strings in list
@@ -41,7 +41,7 @@ def convert_to_bool(string, schema_dict):
     except KeyError:
         print('Could not convert value to bool: value not in conversion dictionary.')
 
-def str_converter(string, schema_type):
+def string_to_schema_type(string, schema_type):
     if schema_type == 'str':
         return string
     elif schema_type == 'bool':
@@ -57,7 +57,7 @@ for line in data:
     if line[:1] == '#':
         continue
     # split line into key/value strings
-    parsed_line = str_splitter(line)
+    parsed_line = parse_string(line)
     try:
         key, value = parsed_line
     except ValueError:
@@ -66,7 +66,7 @@ for line in data:
         key in parameters_schema
     except KeyError:
         print('Key not found in parameters schema.')
-    converted_value = str_converter(value, parameters_schema[key])
+    converted_value = string_to_schema_type(value, parameters_schema[key])
     hashed_data[key] = converted_value
 
 # Debugging
