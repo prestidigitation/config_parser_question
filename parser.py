@@ -33,14 +33,20 @@ def convert_to_bool(string):
     except KeyError:
         print('Could not convert value to bool: value not in conversion dictionary.')
 
+def str_splitter(string):
+    # split string into list of strings delimited by first instance of '=' character. Cannot handle key names containing '='
+    delimited_str_list = string.split('=', 1)
+    # strip out leading and trailing whitespace from strings in list
+    stripped_str_list = [x.strip() for x in delimited_str_list]
+    return stripped_str_list
+
 parsed_lines = []
 for line in data:
-    # skip commented lines
+    # skip commented lines. Slice operator will not throw IndexError exception for empty strings
     if line[:1] == '#':
         continue
-    # strip out all whitespace
-    trimmed_line = ''.join(line.split())
-    parsed_line = trimmed_line.split('=')
+    # split line into key/value strings
+    parsed_line = str_splitter(line)
     # skip erroneous lines
     if parsed_line[0] not in parameters_schema:
         continue
@@ -58,4 +64,7 @@ for key, value in parsed_lines:
         # add remaining string-based key/value pairs to hash
         hashed_data[key] = value
 
-print(hashed_data)
+
+# Debugging
+for key, value in hashed_data.items():
+    print(f"{key}: {value}")
