@@ -8,15 +8,15 @@ with open(path, 'r') as f:
     data = f.readlines()
 
 parameters_schema = {
-    'host': str,
-    'server_id': str,
-    'server_load_alarm': float,
-    'user': str,
-    'verbose': bool,
-    'test_mode': bool,
-    'debug_mode': bool,
-    'log_file_path': str,
-    'send_notifications': bool
+    'host': 'str',
+    'server_id': 'str',
+    'server_load_alarm': 'float',
+    'user': 'str',
+    'verbose': 'bool',
+    'test_mode': 'bool',
+    'debug_mode': 'bool',
+    'log_file_path': 'str',
+    'send_notifications': 'bool'
 }
 
 bool_conversion_schema = {
@@ -41,33 +41,31 @@ def convert_to_bool(string, schema_dict):
     except KeyError:
         print('Could not convert value to bool: value not in conversion dictionary.')
 
-parsed_lines = []
+def str_converter(string, schema_type):
+    if schema_type == 'str':
+        return string
+    elif schema_type == 'bool':
+        return convert_to_bool(string, bool_conversion_schema)
+    elif schema_type == 'int':
+        return int(string)
+    elif schema_type == 'float':
+        return float(string)
+
+hashed_data = {}
 for line in data:
     # skip commented lines. Slice operator will not throw IndexError exception for empty strings
     if line[:1] == '#':
         continue
     # split line into key/value strings
     parsed_line = str_splitter(line)
+    key = parsed_line[0]
+    value = parsed_line[1]
     try:
         parsed_line[0] in parameters_schema
     except KeyError:
         print('Key not found in parameters schema.')
-    parsed_lines.append(parsed_line)
-
-hashed_data = {}
-for key, value in parsed_lines:
-    if parameters_schema[key] is bool:
-        # check if parameter should have a boolean value and try to add it to hash, otherwise skip it
-        hashed_data[key] = convert_to_bool(value, bool_conversion_schema)
-    elif parameters_schema[key] is float:
-        # throws error if float conversion fails
-        hashed_data[key] = float(value)
-    elif parameters_schema[key] is int:
-        hashed_data[key] = int(value)
-    elif parameters_schema[key] is str:
-        hashed_data[key] = value
-    else:
-        print('Error: Key does not exist in the parameters schema.')
+    converted_value = str_converter(value, parameters_schema[key])
+    hashed_data[key] = converted_value
 
 # Debugging
 for key, value in hashed_data.items():
