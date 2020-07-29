@@ -1,19 +1,23 @@
 #!/usr/bin/env python
+
+import sys
+
 path = 'config/example.txt'
 with open(path, 'r') as f:
+    # read in all data from file at once. Would need refactoring to read line by line for massive files
     data = f.readlines()
 
-valid_parameters = [
-    'host',
-    'server_id',
-    'server_load_alarm',
-    'user',
-    'verbose',
-    'test_mode',
-    'debug_mode',
-    'log_file_path',
-    'send_notifications'
-]
+parameters_schema = {
+    'host': str,
+    'server_id': str,
+    'server_load_alarm': float,
+    'user': str,
+    'verbose': bool,
+    'test_mode': bool,
+    'debug_mode': bool,
+    'log_file_path': str,
+    'send_notifications': bool
+}
 
 parsed_lines = []
 for line in data:
@@ -24,7 +28,7 @@ for line in data:
     trimmed_line = ''.join(line.split())
     parsed_line = trimmed_line.split('=')
     # skip erroneous lines
-    if parsed_line[0] not in valid_parameters:
+    if parsed_line[0] not in parameters_schema:
         continue
     parsed_lines.append(parsed_line)
 
