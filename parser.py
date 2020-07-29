@@ -19,8 +19,7 @@ parameters_schema = {
     'send_notifications': bool
 }
 
-def convert_to_bool(string):
-    conversion_dict = {
+bool_conversion_schema = {
         'true': True,
         'false': False,
         'yes': True,
@@ -28,10 +27,6 @@ def convert_to_bool(string):
         'on': True,
         'off': False
     }
-    try:
-        return conversion_dict[string]
-    except KeyError:
-        print('Could not convert value to bool: value not in conversion dictionary.')
 
 def str_splitter(string):
     # split string into list of strings delimited by first instance of '=' character. Cannot handle key names containing '='
@@ -40,6 +35,12 @@ def str_splitter(string):
     stripped_str_list = [x.strip() for x in delimited_str_list]
     return stripped_str_list
 
+def convert_to_bool(string, schema_dict):
+    try:
+        return schema_dict[string]
+    except KeyError:
+        print('Could not convert value to bool: value not in conversion dictionary.')
+
 parsed_lines = []
 for line in data:
     # skip commented lines. Slice operator will not throw IndexError exception for empty strings
@@ -47,24 +48,29 @@ for line in data:
         continue
     # split line into key/value strings
     parsed_line = str_splitter(line)
-    # skip erroneous lines
-    if parsed_line[0] not in parameters_schema:
-        continue
+    try:
+        parsed_line[0] in parameters_schema
+    except KeyError:
+        print('Key not found in parameters schema.')
     parsed_lines.append(parsed_line)
 
 hashed_data = {}
 for key, value in parsed_lines:
     if parameters_schema[key] is bool:
         # check if parameter should have a boolean value and try to add it to hash, otherwise skip it
-        hashed_data[key] = convert_to_bool(value)
-    elif key == 'server_load_alarm':
+        hashed_data[key] = convert_to_bool(value, bool_conversion_schema)
+    elif parameters_schema[key] is float:
         # throws error if float conversion fails
         hashed_data[key] = float(value)
-    else:
-        # add remaining string-based key/value pairs to hash
+    elif parameters_schema[key] is int:
+        hashed_data[key] = int(value)
+    elif parameters_schema[key] is str:
         hashed_data[key] = value
-
+    else:
+        print('Error: Key does not exist in the parameters schema.')
 
 # Debugging
 for key, value in hashed_data.items():
     print(f"{key}: {value}")
+
+print(hashed_data)
