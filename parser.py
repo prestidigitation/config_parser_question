@@ -39,7 +39,7 @@ def convert_to_bool(string, schema_dict):
     try:
         return schema_dict[string]
     except KeyError:
-        print('Could not convert value to bool: value not in conversion dictionary.')
+        print(f"Could not convert value to bool: {string} not in conversion dictionary.")
 
 def string_to_schema_type(string, schema_type):
     if schema_type == 'str':
@@ -61,11 +61,11 @@ for line in data:
     try:
         key, value = parsed_line
     except ValueError:
-        print('There should only be two items in the list: one key and one value')
+        print(f"There should only be two items in the list. Actual list: {parsed_line}")
     try:
         key in parameters_schema
     except KeyError:
-        print('Key not found in parameters schema.')
+        print(f"Key {key} not found in parameters schema.")
     converted_value = string_to_schema_type(value, parameters_schema[key])
     hashed_data[key] = converted_value
 
