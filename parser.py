@@ -86,5 +86,3 @@ def runner(arg):
 
 for arg in args:
     runner(arg)
-
-# path = 'config/example.txt'
