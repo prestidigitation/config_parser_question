@@ -2,11 +2,13 @@
 
 import sys
 
-path = 'config/example.txt'
-with open(path, 'r') as f:
-    # read in all data from file at once. Would need refactoring to read line by line for massive files
-    data = f.readlines()
+args = [arg for arg in sys.argv[1:]]
+try:
+    args[1]
+except IndexError:
+    raise SystemExit(f"Usage: {sys.argv[0]} <config_file_name> [<config_file_name_2> ...]")
 
+# in production code, would likely use a schema validation library instead of writing my own
 parameters_schema = {
     'host': 'str',
     'server_id': 'str',
@@ -51,26 +53,38 @@ def string_to_schema_type(string, schema_type):
     elif schema_type == 'float':
         return float(string)
 
-hashed_data = {}
-for line in data:
-    # skip commented lines. Slice operator will not throw IndexError exception for empty strings
-    if line[:1] == '#':
-        continue
-    # split line into key/value strings
-    parsed_line = parse_string(line)
-    try:
-        key, value = parsed_line
-    except ValueError:
-        print(f"There should only be two items in the list. Actual list: {parsed_line}")
-    try:
-        key in parameters_schema
-    except KeyError:
-        print(f"Key {key} not found in parameters schema.")
-    converted_value = string_to_schema_type(value, parameters_schema[key])
-    hashed_data[key] = converted_value
+def get_file_data(path):
+    with open(path, 'r') as f:
+        # read in all data from file at once. Would need refactoring to read line by line for massive files
+        return f.readlines()
 
-# Debugging
-for key, value in hashed_data.items():
-    print(f"{key}: {value}")
+def runner(arg):
+    hashed_data = {}
+    data = get_file_data(arg)
+    for line in data:
+        # skip commented lines. Slice operator will not throw IndexError exception for empty strings
+        if line[:1] == '#':
+            continue
+        # split line into key/value strings
+        parsed_line = parse_string(line)
+        try:
+            key, value = parsed_line
+        except ValueError:
+            print(f"There should only be two items in the list. Actual list: {parsed_line}")
+        try:
+            key in parameters_schema
+        except KeyError:
+            print(f"Key {key} not found in parameters schema.")
+        converted_value = string_to_schema_type(value, parameters_schema[key])
+        hashed_data[key] = converted_value
 
-print(hashed_data)
+    # Debugging
+    for key, value in hashed_data.items():
+        print(f"{key}: {value}")
+
+    print(hashed_data)
+
+for arg in args:
+    runner(arg)
+
+# path = 'config/example.txt'
