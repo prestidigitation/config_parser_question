@@ -1,0 +1,10 @@
+host = archlinux.org
+server_id=48236
+server_load_alarm=7.1
+user= buckminster_fuller
+# what was I doing, again?
+verbose =false
+test_mode = off
+debug_mode = off
+log_file_path = /tmp/logfile.log
+send_notifications = no
